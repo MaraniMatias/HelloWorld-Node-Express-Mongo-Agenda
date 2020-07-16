@@ -1,0 +1,7 @@
+extends base_email.pug
+//- email body
+block email
+  tr
+    td(align='center' valign='top' style='padding:0px')
+      p Necesitamos validar tu dirección de correo electrónico para comunicarnos con vos.
+      a(href!=`${data.link}`) Confirmar dirección de correo

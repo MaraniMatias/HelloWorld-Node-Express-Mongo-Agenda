@@ -1,29 +1,38 @@
-# README #
+# ContrataDos
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Install
 
-### What is this repository for? ###
+- Instalar Node lts
+- Instalar MongoDB
+- Editar .env
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+**Comandos**
 
-### How do I get set up? ###
+```bash
+# install dependencies
+$ npm install --production
+$ npm start
+```
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+## Desarrollo
 
-### Contribution guidelines ###
+**Estructura de carpetas**
 
-* Writing tests
-* Code review
-* Other guidelines
+**Comandos**
 
-### Who do I talk to? ###
+```bash
+# install dependencies
+$ npm install
 
-* Repo owner or admin
-* Other community or team contact
+# Run server
+$ npm run server
+```
+
+## Release
+
+**Comandos**
+
+```bash
+# Run build script
+$ sh ./release.sh
+```
