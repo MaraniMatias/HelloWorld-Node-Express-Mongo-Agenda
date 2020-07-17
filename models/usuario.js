@@ -5,8 +5,11 @@ const Schema = mongoose.Schema
 const ObjectId = mongoose.Schema.Types.ObjectId
 const saltRounds = 10
 
-const { Roles } = require('../utilities/enums')
-module.exports.PersonaRol = Roles
+const Roles = {
+  PRODUCTOR: 'PRODUCTOR',
+  ADMIN: 'ADMIN',
+}
+module.exports.Roles = Roles
 
 const schema = new Schema(
   {
@@ -22,7 +25,6 @@ const schema = new Schema(
       required: 'El apellido es requerido',
       set: escapeHtml,
     },
-    bibliography: { type: String, max: 500, trim: true /*, set: escapeHtml */ },
     email: {
       type: String,
       unique: true,
@@ -38,22 +40,16 @@ const schema = new Schema(
     roles: [
       {
         type: String,
-        default: Roles.CLIENTE,
+        default: Roles.PRODUCTOR,
         enum: Object.values(Roles),
         required: 'Rol es requerido',
       },
     ],
-    servicios: [{ type: ObjectId, ref: 'habilidad' }],
-    localidad: { type: ObjectId, ref: 'localidad' }, // Del trabajador
-    google_account: { type: Object, access: 'protected' }, // Datos de google,
-    picture: String,
+    external_account: { type: Object, access: 'protected' }, // Datos de google o facebook,
+    picture: { type: String, trim: true, set: escapeHtml },
     password: { type: String, access: 'protected' },
-    show_tutorial: { type: Boolean, default: true },
-    razon_social: { type: String, trim: true }, // O Nombre fisticio
-    zona_trabajo: [{ type: ObjectId, ref: 'localidad' }], // libre todo el mundo
-    // tags: [{ type: String, access: 'protected' }],
-    notification: { type: Boolean, default: true },
     deleted: { type: Boolean, default: false },
+    propducto: { type: ObjectId, ref: 'productor' },
   },
   { timestamps: true }
 )
@@ -78,8 +74,7 @@ schema.static('findOrCreate', function (condition, user, callback) {
   const self = this
   this.findOne(condition)
     .select('-password') // Selecciona todos los campos menos password
-    .populate('servicios')
-    .populate('localidad')
+    .populate('productor')
     .exec((err, result) => {
       if (err || result) {
         callback(err, result)
@@ -89,4 +84,4 @@ schema.static('findOrCreate', function (condition, user, callback) {
     })
 })
 
-module.exports.Persona = mongoose.model('persona', schema)
+module.exports.Usuario = mongoose.model('usuario', schema)

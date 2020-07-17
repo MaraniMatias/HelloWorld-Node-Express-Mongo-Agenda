@@ -3,7 +3,7 @@ const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const { sendRes, auth, check, checkErrors } = require('../utilities/router')
-const { Persona: User } = require('../models/persona')
+const { Usuario: User } = require('../models/usuario')
 
 const { Agenda } = require('../utilities/agenda')
 const verificarEamilSecret = 'QdVYGl3pXU562loudRC3_QTP1'
@@ -44,15 +44,12 @@ router.get(
 router.get(
   '/api/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: process.env.FRONT_URL + '/login?error=google_token',
-    // sauccessRedirect: '/me',
+    failureRedirect:
+      process.env.FRONT_URL + '/callback.html?error=google_token',
   }),
   function (req, res) {
     const token = passport.setTokeTo(res, { value: req.user._id })
-    res.redirect(process.env.FRONT_URL + '/login?token=' + token)
-    // res.redirect('back')
-    // res, status, data, message, error
-    // return sendRes(res, 200, req.user.toJSON(), 'Success', null)
+    res.redirect(process.env.FRONT_URL + '/callback.html?token=' + token)
   }
 )
 
@@ -158,6 +155,8 @@ router.post('/api/auth/forgetpassword', async (req, res) => {
     return sendRes(res, cod, null, message, err)
   }
 })
+
+// TODO perdi la contraseña pero estoy logeado con facebook o Google
 // POST api/auth/forgetpassword/change {token,email,password}
 router.post('/api/auth/forgetpassword/change', async function (req, res) {
   try {
@@ -182,6 +181,7 @@ router.post('/api/auth/forgetpassword/change', async function (req, res) {
     return sendRes(res, cod, null, message, err)
   }
 })
+
 // POST api/auth/forgetpassword/valid {token,email,password}
 router.get('/api/auth/forgetpassword/valid', function (req, res) {
   try {

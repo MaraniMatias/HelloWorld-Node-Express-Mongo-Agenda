@@ -6,7 +6,7 @@ const checkProps = require('./checkProps')
  * sendRes
  *
  * Solo con el objetivo de enviar siempre una misma respuesta
- * @param {expressResponse} res
+ * @param {ExpressResponse} res
  * @param {String} cod Response Status Cod
  * @param {any} data Response Data
  * @param {String} message Response Message
