@@ -53,6 +53,28 @@ router.get(
   }
 )
 
+// GET /api/auth/google
+router.get(
+  '/api/auth/facebook',
+  passport.authenticate('facebook', {
+    scope: ['email'],
+    session: false,
+  })
+)
+
+// GET /api/auth/google/callback
+router.get(
+  '/api/auth/facebook/callback',
+  passport.authenticate('facebook', {
+    failureRedirect:
+      process.env.FRONT_URL + '/callback.html?error=google_token',
+  }),
+  function (req, res) {
+    const token = passport.setTokeTo(res, { value: req.user._id })
+    res.redirect(process.env.FRONT_URL + '/callback.html?token=' + token)
+  }
+)
+
 // POST /api/auth/login {mail password}
 router.post(
   '/api/auth/login',
