@@ -1,4 +1,4 @@
-// require('dotenv-flow').config()
+const fs = require('fs')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compress = require('compression')
@@ -8,8 +8,11 @@ const app = express()
 const favicon = require('serve-favicon')
 const helmet = require('helmet')
 const restify = require('express-restify-mongoose')
-const statusMonitor = require('express-status-monitor')
-const Routers = require('./router')
+const auth = require('http-auth')
+const statusMonitor = require('express-status-monitor')({
+  path: '',
+  title: 'Api Status',
+})
 const passport = require('./utilities/passport')
 const { sendRes } = require('./utilities/router')
 Object.assign = require('object-assign')
@@ -44,8 +47,13 @@ app.use(favicon(getPathPublicWith('favicon.ico')))
 app.use(express.static(path.join.apply(null, [__dirname, 'public'])))
 
 // System monitor
-// TODO add basic AUTH
-app.use(statusMonitor({ title: 'ContrataDos Status', path: '/api/status' }))
+const basic = auth.basic({ realm: 'API Monitor' }, function (user, pass, next) {
+  next(
+    user === process.env.API_STATUS_USER && pass === process.env.API_STATUS_PASS
+  )
+})
+app.use(statusMonitor.middleware)
+app.get('/api/status', basic.check(statusMonitor.pageRoute))
 
 restify.defaults({
   prefix: '/api',
@@ -54,11 +62,15 @@ restify.defaults({
   // lean: false,
   runValidators: true,
   onError: (err, req, res) =>
-    sendRes(res, req.erm.statusCode, null, 'Error', err.message, null),
+    sendRes(res, req.erm.statusCode, err.message, 'error'),
 })
 
 // Agregar routes
-Routers.setTo(app)
-// app.all('/api/*', passport.authenticate('jwt', { session: false }))
+fs.readdirSync(path.join(__dirname, 'router')).map((fileName) => {
+  if (fileName !== 'index.js') {
+    console.log('Load router', fileName)
+    app.use(require(path.join(__dirname, 'router', fileName)))
+  }
+})
 
 module.exports = app

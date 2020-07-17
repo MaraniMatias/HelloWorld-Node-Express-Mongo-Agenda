@@ -1,4 +1,4 @@
-require('dotenv-flow').config()
+require('dotenv-flow').config({ purge_dotenv: true, silent: true })
 const PORT = process.env.PORT || 3000
 const cluster = require('cluster')
 const numCPUs = require('os').cpus().length

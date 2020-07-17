@@ -1,4 +1,4 @@
-const SECRET_KEY_SESSION = process.env.SECRET_KEY_SESSION || 'C0n7r47a2_hola:D'
+const SECRET_KEY_SESSION = process.env.SECRET_KEY_SESSION || 'M4r4n1M47n145'
 const passportJWT = require('passport-jwt')
 const jwt = require('jsonwebtoken')
 const ExtractJwt = passportJWT.ExtractJwt
@@ -6,7 +6,7 @@ const JwtStrategy = passportJWT.Strategy
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-const { Persona } = require('./../models/persona')
+const { Usuario } = require('./../models/usuario')
 
 // Config passport
 passport.use(
@@ -27,7 +27,7 @@ passport.use(
         googleId: profile.id,
         email,
         picture: profile._json.picture,
-        google_account: {
+        external_account: {
           id: profile.id,
           _json: profile._json,
           accessToken,
@@ -37,7 +37,7 @@ passport.use(
         gender: profile.gender,
         organizations: profile._json.organizations,
       }
-      Persona.findOrCreate({ email }, user, (err, userDb) => {
+      Usuario.findOrCreate({ email }, user, (err, userDb) => {
         if (err || !userDb) return done(err, null)
         else return done(err, userDb)
       })
@@ -51,8 +51,8 @@ passport.use(
     async function (email, password, next) {
       try {
         // La validacion del elmail, lo hacemos des el endpoint su perrior
-        const user = await Persona.findOne({ email, deleted: false })
-          .populate('servicios')
+        const user = await Usuario.findOne({ email, deleted: false })
+          .populate('productor')
           .populate('localidad')
         if (user && (await user.authenticate(password))) {
           user.password = null
@@ -78,9 +78,9 @@ passport.use(
     function (jwtPayload, next) {
       console.log('payload received', jwtPayload.value)
       // usually this would be a database call:
-      Persona.findById(jwtPayload.value)
+      Usuario.findById(jwtPayload.value)
         .select('-password') // Selecciona todos los campos menos password
-        .populate('servicios')
+        .populate('productor')
         .populate('localidad')
         .exec(function (err, user) {
           if (err || !user) {
@@ -102,7 +102,7 @@ passport.deserializeUser(function (id, cb) {
   if (process.env.NODE_ENV === 'development') {
     console.log('deserializeUser', id)
   }
-  Persona.findById(id, cb)
+  Usuario.findById(id, cb)
 })
 
 passport.setTokeTo = (res, { value }) => {

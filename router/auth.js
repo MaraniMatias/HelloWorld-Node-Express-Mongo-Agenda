@@ -3,7 +3,7 @@ const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const { sendRes, auth, check, checkErrors } = require('../utilities/router')
-const { Persona: User } = require('../models/persona')
+const { Usuario: User } = require('../models/usuario')
 
 const { Agenda } = require('../utilities/agenda')
 const verificarEamilSecret = 'QdVYGl3pXU562loudRC3_QTP1'
@@ -44,15 +44,12 @@ router.get(
 router.get(
   '/api/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: process.env.FRONT_URL + '/login?error=google_token',
-    // sauccessRedirect: '/me',
+    failureRedirect:
+      process.env.FRONT_URL + '/callback.html?error=google_token',
   }),
   function (req, res) {
     const token = passport.setTokeTo(res, { value: req.user._id })
-    res.redirect(process.env.FRONT_URL + '/login?token=' + token)
-    // res.redirect('back')
-    // res, status, data, message, error
-    // return sendRes(res, 200, req.user.toJSON(), 'Success', null)
+    res.redirect(process.env.FRONT_URL + '/callback.html?token=' + token)
   }
 )
 
@@ -63,10 +60,9 @@ router.post(
   (req, res) => {
     if (req.user.email_verified) {
       passport.setTokeTo(res, { value: req.user._id })
-      // res, status, data, message, error
-      return sendRes(res, 200, req.user, 'Success', null)
+      return sendRes(res, 200, req.user)
     } else {
-      return sendRes(res, 200, req.user, 'Success', 'Email is not verified')
+      return sendRes(res, 200, req.user, 'Email is not verified')
     }
   }
 )
@@ -74,8 +70,7 @@ router.post(
 // POST api/auth/logout
 router.post('/api/auth/logout', function (req, res) {
   req.logout()
-  // res, status, data, message, error
-  return sendRes(res, 200, null, 'Success', null)
+  return sendRes(res, 200)
 })
 
 // POST /api/auth/signup {Alta de un usuario}
@@ -94,17 +89,16 @@ router.post('/api/auth/signup', async function (req, res) {
       email: req.body.email,
       nombre: req.body.nombre,
       password: req.body.password,
-      role: req.body.role,
       // picture: '/avatars/matthew.png',
     })
     const userDB = await user.save()
     sendVerifyEmail(userDB._id, userDB.email)
-    return sendRes(res, 200, null, 'User created, check your email', null)
+    return sendRes(res, 200, null, 'User created, check your email')
   } catch (err) {
     if (err.code === 11000) {
-      return sendRes(res, 400, null, 'Error', 'Email ya registrado.')
+      return sendRes(res, 400, null, 'Email ya registrado.')
     } else {
-      return sendRes(res, 500, null, 'Error saving new user', err)
+      return sendRes(res, 500, err, 'Error saving new user')
     }
   }
 })
@@ -120,12 +114,12 @@ router.post('/api/auth/signup/verification', async function (req, res) {
     if (user) {
       user.email_verified = true
       await user.save()
-      return sendRes(res, 200, null, 'Success', null)
+      return sendRes(res, 200)
     } else {
-      return sendRes(res, 404, null, 'page not found', null)
+      return sendRes(res, 404, null, 'page not found')
     }
   } catch (err) {
-    return sendRes(res, 500, null, 'Error saving new user', err)
+    return sendRes(res, 500, err, 'Error saving new user')
   }
 })
 
@@ -135,10 +129,10 @@ router.post('/api/auth/sendemail', function (req, res) {
   if (!isValid) return
   return sendVerifyEmail(req.body.email)
     .then(() => {
-      return sendRes(res, 200, null, 'Success', null)
+      return sendRes(res, 200)
     })
     .catch((err) => {
-      return sendRes(res, 500, null, 'Error saving new user', err)
+      return sendRes(res, 500, err, 'Error saving new user')
     })
 })
 
@@ -151,13 +145,15 @@ router.post('/api/auth/forgetpassword', async (req, res) => {
     const user = await User.findOne({ email: req.body.email })
     await user.save()
     sendForgetPassword(user._id, req.body.email)
-    return sendRes(res, 200, null, 'Success', null)
+    return sendRes(res, 200)
   } catch (err) {
     const cod = err.name === 'JsonWebTokenError' ? 404 : 500
     const message = cod === 404 ? 'page not found' : 'Error saving new user'
-    return sendRes(res, cod, null, message, err)
+    return sendRes(res, cod, err, message)
   }
 })
+
+// TODO perdi la contraseña pero estoy logeado con facebook o Google
 // POST api/auth/forgetpassword/change {token,email,password}
 router.post('/api/auth/forgetpassword/change', async function (req, res) {
   try {
@@ -172,16 +168,17 @@ router.post('/api/auth/forgetpassword/change', async function (req, res) {
     if (user) {
       user.password = req.body.password
       await user.save()
-      return sendRes(res, 200, null, 'Success', null)
+      return sendRes(res, 200)
     } else {
-      return sendRes(res, 404, null, 'page not found', null)
+      return sendRes(res, 404, null, 'page not found')
     }
   } catch (err) {
     const cod = err.name === 'JsonWebTokenError' ? 404 : 500
     const message = cod === 404 ? 'page not found' : 'Error saving new user'
-    return sendRes(res, cod, null, message, err)
+    return sendRes(res, cod, err, message)
   }
 })
+
 // POST api/auth/forgetpassword/valid {token,email,password}
 router.get('/api/auth/forgetpassword/valid', function (req, res) {
   try {
@@ -189,16 +186,15 @@ router.get('/api/auth/forgetpassword/valid', function (req, res) {
     if (!isValid) return
 
     jwt.verify(req.query.token, forgetPasswordSecret)
-    return sendRes(res, 200, null, 'Success', null)
+    return sendRes(res, 200)
   } catch (err) {
-    return sendRes(res, 404, null, 'page no found', err)
+    return sendRes(res, 404, err, 'page no found')
   }
 })
 
 // GET api/auth/me
 router.get('/api/auth/me', auth.isLogin, function (req, res) {
-  // res, status, data, message, error
-  return sendRes(res, 200, req.user.toJSON(), 'Success', null)
+  return sendRes(res, 200, req.user.toJSON())
 })
 
 module.exports = router
