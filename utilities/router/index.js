@@ -1,4 +1,5 @@
 'use strict'
+const express = require('express')
 const get = require('../get')
 const auth = require('./routAuth')
 const checkProps = require('./checkProps')
@@ -15,7 +16,7 @@ const checkProps = require('./checkProps')
  */
 const sendRes = (res, cod = 200, data, message = '', error = null) => {
   // const sendRes = (cod = 200, dataOrError, message = '' ) => {
-  // const res =  express.response
+  // const res = express.response
   res.status(cod)
   // return res.json({ data: dataOrError, message })
   return res.json({ data, message, error })

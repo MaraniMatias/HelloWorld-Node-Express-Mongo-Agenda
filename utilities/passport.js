@@ -6,7 +6,7 @@ const JwtStrategy = passportJWT.Strategy
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-const { Persona } = require('./../models/usuario')
+const { Usuario } = require('./../models/usuario')
 
 // Config passport
 passport.use(
@@ -37,7 +37,7 @@ passport.use(
         gender: profile.gender,
         organizations: profile._json.organizations,
       }
-      Persona.findOrCreate({ email }, user, (err, userDb) => {
+      Usuario.findOrCreate({ email }, user, (err, userDb) => {
         if (err || !userDb) return done(err, null)
         else return done(err, userDb)
       })
@@ -51,7 +51,7 @@ passport.use(
     async function (email, password, next) {
       try {
         // La validacion del elmail, lo hacemos des el endpoint su perrior
-        const user = await Persona.findOne({ email, deleted: false })
+        const user = await Usuario.findOne({ email, deleted: false })
           .populate('productor')
           .populate('localidad')
         if (user && (await user.authenticate(password))) {
@@ -78,7 +78,7 @@ passport.use(
     function (jwtPayload, next) {
       console.log('payload received', jwtPayload.value)
       // usually this would be a database call:
-      Persona.findById(jwtPayload.value)
+      Usuario.findById(jwtPayload.value)
         .select('-password') // Selecciona todos los campos menos password
         .populate('productor')
         .populate('localidad')
@@ -102,7 +102,7 @@ passport.deserializeUser(function (id, cb) {
   if (process.env.NODE_ENV === 'development') {
     console.log('deserializeUser', id)
   }
-  Persona.findById(id, cb)
+  Usuario.findById(id, cb)
 })
 
 passport.setTokeTo = (res, { value }) => {
