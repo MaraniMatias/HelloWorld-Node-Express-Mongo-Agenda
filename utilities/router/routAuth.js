@@ -7,7 +7,7 @@ const isLogin = [
     if (req.user) {
       return next()
     } else {
-      return sendRes(res, 401, null, 'Unauthorized', 'No tienes permiso')
+      return sendRes(res, 401, null, 'Unauthorized')
     }
   },
 ]

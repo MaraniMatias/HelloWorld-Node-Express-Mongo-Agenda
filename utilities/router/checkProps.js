@@ -40,7 +40,7 @@ function check(object, keys = '') {
 function checkErrors(res, errorsList = []) {
   const errors = errorsList.filter((err) => typeof err === 'string')
   if (errors.length > 0) {
-    return sendRes(res, 400, null, 'Body validation errors', errors)
+    return sendRes(res, 400, errors, 'Body validation errors')
   } else {
     return true
   }

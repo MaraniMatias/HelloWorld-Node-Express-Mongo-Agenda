@@ -62,7 +62,7 @@ restify.defaults({
   // lean: false,
   runValidators: true,
   onError: (err, req, res) =>
-    sendRes(res, req.erm.statusCode, null, 'Error', err.message, null),
+    sendRes(res, req.erm.statusCode, err.message, 'error'),
 })
 
 // Agregar routes

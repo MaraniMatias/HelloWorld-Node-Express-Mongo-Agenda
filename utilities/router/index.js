@@ -1,5 +1,4 @@
 'use strict'
-const express = require('express')
 const get = require('../get')
 const auth = require('./routAuth')
 const checkProps = require('./checkProps')
@@ -9,17 +8,16 @@ const checkProps = require('./checkProps')
  * Solo con el objetivo de enviar siempre una misma respuesta
  * @param {ExpressResponse} res
  * @param {String} cod Response Status Cod
- * @param {any} data Response Data
+ * @param {any} dataOrError, Response Data
  * @param {String} message Response Message
- * @param {String} error Response Error
- * @returns {Object} {data, message, error}
+ * @returns {{data:any,message:string}}
  */
-const sendRes = (res, cod = 200, data, message = '', error = null) => {
-  // const sendRes = (cod = 200, dataOrError, message = '' ) => {
-  // const res = express.response
+const sendRes = (res, cod = 200, dataOrError, message) => {
   res.status(cod)
-  // return res.json({ data: dataOrError, message })
-  return res.json({ data, message, error })
+  return res.json({
+    data: dataOrError,
+    message: message || cod === 200 ? 'Success' : undefined,
+  })
 }
 
 /**
@@ -58,7 +56,7 @@ const deleteProp = function (req, _, next) {
 }
 
 const block = function (_, res) {
-  return sendRes(res, 404, null)
+  return sendRes(res, 404)
 }
 
 module.exports = {

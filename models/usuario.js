@@ -79,6 +79,9 @@ schema.static('findOrCreate', function (condition, user, callback) {
       if (err || result) {
         callback(err, result)
       } else {
+        if (!user.roles || (user.roles && user.roles.length === 0)) {
+          user.roles = [Roles.PRODUCTOR]
+        }
         self.create(user, callback)
       }
     })
