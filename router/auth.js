@@ -53,7 +53,7 @@ router.get(
   }
 )
 
-// GET /api/auth/google
+// GET /api/auth/facebook
 router.get(
   '/api/auth/facebook',
   passport.authenticate('facebook', {
@@ -62,7 +62,7 @@ router.get(
   })
 )
 
-// GET /api/auth/google/callback
+// GET /api/auth/facebook/callback
 router.get(
   '/api/auth/facebook/callback',
   passport.authenticate('facebook', {
