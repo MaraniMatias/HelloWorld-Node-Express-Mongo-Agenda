@@ -119,7 +119,6 @@ router.post('/api/auth/signup', async function (req, res) {
     sendVerifyEmail(userDB._id, userDB.email)
     return sendRes(res, 200, null, 'User created, check your email')
   } catch (err) {
-    console.log(err)
     if (err.code === 11000) {
       return sendRes(res, 400, null, 'Email ya registrado.')
     } else {
@@ -134,7 +133,7 @@ router.post('/api/auth/signup/verification', async function (req, res) {
     const isValid = checkErrors([check(req.body, 'token').isString()])
     if (!isValid) return
 
-    const { _id, email } = jwt.verify(req.body.token, forgetPasswordSecret)
+    const { _id, email } = jwt.verify(req.body.token, verificarEamilSecret)
     const user = await User.findOne({ _id, email, email_verified: false })
     if (user) {
       user.email_verified = true
@@ -149,16 +148,23 @@ router.post('/api/auth/signup/verification', async function (req, res) {
 })
 
 // POST /api/auth/sendemail {email}
-router.post('/api/auth/sendemail', function (req, res) {
-  const isValid = checkErrors([check(req.body, 'email').isEmail()])
-  if (!isValid) return
-  return sendVerifyEmail(req.body.email)
-    .then(() => {
+router.post('/api/auth/sendemail', async function (req, res) {
+  try {
+    const isValid = checkErrors([check(req.body, 'email').isEmail()])
+    if (!isValid) return
+    const user = await User.findOne({
+      email: req.body.email,
+      email_verified: false,
+    })
+    if (user) {
+      sendVerifyEmail(user, user.email)
       return sendRes(res, 200)
-    })
-    .catch((err) => {
-      return sendRes(res, 500, err, 'Error saving new user')
-    })
+    } else {
+      return sendRes(res, 404, null, 'page not found')
+    }
+  } catch (err) {
+    return sendRes(res, 500, err, 'Error saving new user')
+  }
 })
 
 // POST /api/auth/login {mail password}
