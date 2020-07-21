@@ -7,15 +7,16 @@ const autoStartJobs = []
 
 module.exports.Agenda = new Agenda({ mongo: mongoose.connection })
 
-module.exports.start = async function () {
+module.exports.start = async () => {
   try {
     const agenda = this.Agenda
 
     // Auto load task
     fs.readdirSync(__dirname)
       .filter((fileName) => /^.+\.job\.js$/.test(fileName))
-      .map((fileName) => {
+      .forEach((fileName) => {
         const fileDir = path.join(__dirname, fileName)
+        /* eslint global-require: 0 import/no-dynamic-require: 0 */
         const { name, job, options, autoStart, jobCreate } = require(fileDir)
         if (autoStart) autoStartJobs.push(jobCreate)
         const agendaOptions = options || { priority: 'normal', concurrency: 2 }

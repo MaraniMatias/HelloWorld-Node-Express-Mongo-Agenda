@@ -1,9 +1,11 @@
 require('dotenv-flow').config({ purge_dotenv: true, silent: true })
+
 const PORT = process.env.PORT || 3000
 const cluster = require('cluster')
 const numCPUs = require('os').cpus().length
 
 const mongoose = require('mongoose')
+
 mongoose.Promise = global.Promise
 const getMongoURL = require('./utilities/getMongoURL')
 const getLocalIP = require('./utilities/getLocalIP')
@@ -21,7 +23,7 @@ function startServer() {
   }
   mongoose.connect(mongoURL, mongooseOptions, (err) => {
     if (err) {
-      console.error('Error al conectar a la base de datos: ' + err)
+      console.error(`Error al conectar a la base de datos: ${err}`)
       process.exit()
     } else {
       app.listen(PORT, '0.0.0.0', () => {

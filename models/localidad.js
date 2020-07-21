@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const ObjectId = mongoose.Schema.Types.ObjectId
+
+const { Schema } = mongoose
+const { ObjectId } = mongoose.Schema.Types
 
 const schema = new Schema({
   cod_postal: { type: Number, required: true },

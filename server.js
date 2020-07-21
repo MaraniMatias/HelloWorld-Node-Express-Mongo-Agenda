@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const compress = require('compression')
 const cors = require('cors')
 const express = require('express')
+
 const app = express()
 const favicon = require('serve-favicon')
 const helmet = require('helmet')
@@ -16,6 +17,7 @@ const statusMonitor = require('express-status-monitor')({
 const passport = require('./utilities/passport')
 const { sendRes } = require('./utilities/router')
 Object.assign = require('object-assign')
+
 const isProd = process.env.NODE_ENV === 'production'
 
 const getPathPublicWith = (addPath) => {
@@ -66,9 +68,10 @@ restify.defaults({
 })
 
 // Agregar routes
-fs.readdirSync(path.join(__dirname, 'router')).map((fileName) => {
+fs.readdirSync(path.join(__dirname, 'router')).forEach((fileName) => {
   if (fileName !== 'index.js') {
     console.log('Load router', fileName)
+    /* eslint global-require: 0 import/no-dynamic-require: 0 */
     app.use(require(path.join(__dirname, 'router', fileName)))
   }
 })

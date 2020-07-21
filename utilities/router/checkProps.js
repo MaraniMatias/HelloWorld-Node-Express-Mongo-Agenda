@@ -1,6 +1,4 @@
-'use strict'
-const sendRes = require('./checkProps')
-const get = require('./../get')
+const get = require('../get')
 
 function isDefined(prop) {
   return typeof prop !== 'undefined' && prop !== null
@@ -38,13 +36,9 @@ function check(object, keys = '') {
   }
 }
 
-function checkErrors(res, errorsList = []) {
+function checkErrors(errorsList = []) {
   const errors = errorsList.filter((err) => typeof err === 'string')
-  if (errors.length > 0) {
-    return sendRes(res, 400, errors, 'Body validation errors')
-  } else {
-    return true
-  }
+  return errors.length || errors
 }
 
 module.exports = {

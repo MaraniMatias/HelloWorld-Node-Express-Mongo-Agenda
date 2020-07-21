@@ -1,4 +1,3 @@
-'use strict'
 /**
  * get
  *
@@ -19,12 +18,12 @@ function get(object, keys = '', setDefault) {
   const key = arrKeys[0]
   if (typeof key === 'undefined' && key === '') {
     return setDefault
-  } else if (typeof object[key] !== 'undefined' && object[key] !== null) {
+  }
+  if (typeof object[key] !== 'undefined' && object[key] !== null) {
     return typeof arrKeys[1] !== 'undefined'
       ? get(object[key], keys.replace(`${key}.`, ''))
       : object[key]
-  } else {
-    return setDefault
   }
+  return setDefault
 }
 module.exports = get

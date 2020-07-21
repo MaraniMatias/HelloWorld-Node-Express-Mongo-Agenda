@@ -1,4 +1,5 @@
 const os = require('os')
+
 const ifaces = os.networkInterfaces()
 
 // Listar las IP de las interfaces de red.
