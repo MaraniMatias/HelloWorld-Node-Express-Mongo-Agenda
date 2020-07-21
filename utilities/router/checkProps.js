@@ -1,5 +1,6 @@
 'use strict'
-const { sendRes, get } = require('../router/index')
+const sendRes = require('./checkProps')
+const get = require('./../get')
 
 function isDefined(prop) {
   return typeof prop !== 'undefined' && prop !== null
