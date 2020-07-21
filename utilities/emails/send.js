@@ -12,17 +12,15 @@ const options = (function () {
       user: process.env.EMAIL_AUTH_USER,
       pass: process.env.EMAIL_AUTH_PASS,
     },
-    email_no_replay:
-      process.env.EMAIL_NOMBRE + ' <' + process.env.EMAIL_AUTH_USER + '>',
+    email_no_replay: `${process.env.EMAIL_NOMBRE} <${process.env.EMAIL_AUTH_USER}>`,
     logo: process.env.EMAIL_LOGO,
   }
 
   if (/gmail/.test(process.env.EMAIL_HOST)) {
     _o.service = 'gmail' // only smtp and google account
     return smtpTransport(_o)
-  } else {
-    return _o
   }
+  return _o
 })()
 
 if (process.env.NODE_ENV !== 'production') console.log(options)
@@ -37,7 +35,7 @@ const getHtmlEmail = (file, obj = {}) => {
 module.exports = async function ({ subject, template }, data) {
   const sendEmailTo = data.email || data.sendEmailTo
   if (process.env.NODE_ENV !== 'production') {
-    console.log("sendMail '" + subject + "' to", sendEmailTo)
+    console.log(`sendMail '${subject}' to`, sendEmailTo)
   }
   // Generate test SMTP service account from ethereal.email
   // await nodemailer.createTestAccount();
@@ -61,7 +59,7 @@ module.exports = async function ({ subject, template }, data) {
       process.env.EMAIL_AUTH_USER !== sendEmailTo
         ? process.env.EMAIL_AUTH_USER
         : undefined,
-    subject: subject + ' - ' + process.env.EMAIL_NOMBRE,
+    subject: `${subject} - ${process.env.EMAIL_NOMBRE}`,
     html: getHtmlEmail(template, { data, subject }),
   })
 }

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const ObjectId = mongoose.Schema.Types.ObjectId
+
+const { Schema } = mongoose
+const { ObjectId } = mongoose.Schema.Types
 const Localidad = require('./localidad')
 
 const schema = new Schema({
@@ -9,15 +10,16 @@ const schema = new Schema({
 })
 schema.set('toJSON', { virtuals: true })
 
-schema.method('updateIdLocalidades', function (callback) {
+schema.method('updateIdLocalidades', (callback) => {
   const provinciaID = this._id
   this.localidades.forEach((loc) => {
-    Localidad.findById(loc, (err, localidad) => {
-      if (err || !localidad) {
-        callback(err, null)
+    Localidad.findById(loc, (error, localidad) => {
+      if (error || !localidad) {
+        callback(error, null)
       } else {
+        /* eslint no-param-reassign: 0 */
         localidad.provincia = provinciaID
-        localidad.save(function (err, localidadDB) {
+        localidad.save((err, localidadDB) => {
           if (err || !localidadDB) {
             callback(err, null)
           } else {

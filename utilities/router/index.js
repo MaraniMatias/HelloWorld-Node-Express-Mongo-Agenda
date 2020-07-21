@@ -1,4 +1,3 @@
-'use strict'
 const get = require('../get')
 const auth = require('./routAuth')
 const checkProps = require('./checkProps')

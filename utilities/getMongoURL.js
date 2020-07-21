@@ -2,7 +2,7 @@ module.exports = function () {
   const mongodbUser = process.env.MONGODB_USER || ''
   const mongoPass = process.env.MONGODB_PASSWORD || ''
   const mongodbName = process.env.MONGODB_DATABASE || 'testdb'
-  let mongoURLLabel = 'mongodb://localhost/' + mongodbName
+  let mongoURLLabel = `mongodb://localhost/${mongodbName}`
   if (
     process.env.NODE_ENV &&
     process.env.NODE_ENV === 'production' &&

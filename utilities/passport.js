@@ -1,13 +1,14 @@
 const SECRET_KEY_SESSION = process.env.SECRET_KEY_SESSION || 'M4r4n1M47n145'
 const passportJWT = require('passport-jwt')
 const jwt = require('jsonwebtoken')
-const ExtractJwt = passportJWT.ExtractJwt
+
+const { ExtractJwt } = passportJWT
 const JwtStrategy = passportJWT.Strategy
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-const { Usuario } = require('./../models/usuario')
+const { Usuario } = require('../models/usuario')
 
 // Config passport
 passport.use(
@@ -15,13 +16,13 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.SERVER_URL + '/api/auth/google/callback',
+      callbackURL: `${process.env.SERVER_URL}/api/auth/google/callback`,
     },
     function (accessToken, refreshToken, profile, done) {
       if (process.env.NODE_ENV === 'development') {
         console.log({ accessToken, profile: profile._json })
       }
-      const email = profile._json.email
+      const { email } = profile._json
       const user = {
         nombre: profile.name.givenName,
         apellido: profile.name.familyName,
@@ -39,7 +40,7 @@ passport.use(
       }
       Usuario.findOrCreate({ email }, user, (err, userDb) => {
         if (err || !userDb) return done(err, null)
-        else return done(err, userDb)
+        return done(err, userDb)
       })
     }
   )
@@ -56,12 +57,12 @@ passport.use(
           .populate('localidad')
         if (user && user.provider !== 'local') {
           return next(null, user)
-        } else if (user && (await user.authenticate(password))) {
+        }
+        if (user && (await user.authenticate(password))) {
           user.password = null
           return next(null, user)
-        } else {
-          return next(null, false)
         }
+        return next(null, false)
       } catch (err) {
         return next(err, false)
       }
@@ -99,14 +100,14 @@ passport.use(
     {
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
-      callbackURL: process.env.SERVER_URL + '/api/auth/facebook/callback',
+      callbackURL: `${process.env.SERVER_URL}/api/auth/facebook/callback`,
       profileFields: ['id', 'emails', 'photos', 'first_name', 'last_name'],
     },
     function (accessToken, refreshToken, profile, done) {
       if (process.env.NODE_ENV === 'development') {
         console.log({ accessToken, profile: profile._json })
       }
-      const email = profile._json.email
+      const { email } = profile._json
       const user = {
         nombre: profile.name.givenName,
         apellido: profile.name.familyName,
@@ -122,7 +123,7 @@ passport.use(
       }
       Usuario.findOrCreate({ email }, user, (err, userDb) => {
         if (err || !userDb) return done(err, null)
-        else return done(err, userDb)
+        return done(err, userDb)
       })
     }
   )
@@ -143,7 +144,7 @@ passport.deserializeUser(function (id, cb) {
 
 passport.setTokeTo = (res, { value }) => {
   const token = jwt.sign({ value }, SECRET_KEY_SESSION)
-  res.setHeader('Authorization', 'Bearer ' + token)
+  res.setHeader('Authorization', `Bearer ${token}`)
   return token
 }
 

@@ -1,8 +1,10 @@
+/* eslint func-names: 0 */
 const mongoose = require('mongoose')
 const escapeHtml = require('escape-html')
 const bcrypt = require('bcrypt')
-const Schema = mongoose.Schema
-const ObjectId = mongoose.Schema.Types.ObjectId
+
+const { Schema } = mongoose
+const { ObjectId } = mongoose.Schema.Types
 const saltRounds = 10
 
 const Roles = {
@@ -57,7 +59,7 @@ const schema = new Schema(
 schema.set('toJSON', { virtuals: true })
 
 schema.virtual('display_name').get(function () {
-  return this.razon_social || this.apellido + ' ' + this.nombre
+  return this.razon_social || `${this.apellido} ${this.nombre}`
 })
 
 schema.pre('save', async function (next) {
@@ -81,6 +83,7 @@ schema.static('findOrCreate', function (condition, user, callback) {
         callback(err, result)
       } else {
         if (!user.roles || (user.roles && user.roles.length === 0)) {
+          /* eslint no-param-reassign: 0 */
           user.roles = [Roles.PRODUCTOR]
         }
         self.create(user, callback)
