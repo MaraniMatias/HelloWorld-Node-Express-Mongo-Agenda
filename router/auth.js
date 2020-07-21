@@ -80,7 +80,9 @@ router.post(
   '/api/auth/login',
   passport.authenticate('local', { session: false }),
   (req, res) => {
-    if (req.user.email_verified) {
+    if (req.user.provider !== 'local') {
+      return sendRes(res, 404, null, 'Inicie sescion con ' + req.user.provider)
+    } else if (req.user.email_verified) {
       passport.setTokeTo(res, { value: req.user._id })
       return sendRes(res, 200, req.user)
     } else {
@@ -117,6 +119,7 @@ router.post('/api/auth/signup', async function (req, res) {
     sendVerifyEmail(userDB._id, userDB.email)
     return sendRes(res, 200, null, 'User created, check your email')
   } catch (err) {
+    console.log(err)
     if (err.code === 11000) {
       return sendRes(res, 400, null, 'Email ya registrado.')
     } else {

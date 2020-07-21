@@ -54,7 +54,9 @@ passport.use(
         const user = await Usuario.findOne({ email, deleted: false })
           .populate('productor')
           .populate('localidad')
-        if (user && (await user.authenticate(password))) {
+        if (user && user.provider !== 'local') {
+          return next(null, user)
+        } else if (user && (await user.authenticate(password))) {
           user.password = null
           return next(null, user)
         } else {
