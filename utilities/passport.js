@@ -18,7 +18,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: `${process.env.SERVER_URL}/api/auth/google/callback`,
     },
-    function (accessToken, refreshToken, profile, done) {
+    (accessToken, refreshToken, profile, done) => {
       if (process.env.NODE_ENV === 'development') {
         console.log({ accessToken, profile: profile._json })
       }
@@ -49,7 +49,7 @@ passport.use(
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' },
-    async function (email, password, next) {
+    async (email, password, next) => {
       try {
         // La validacion del elmail, lo hacemos des el endpoint su perrior
         const user = await Usuario.findOne({ email, deleted: false })
@@ -78,14 +78,14 @@ passport.use(
       secretOrKey: SECRET_KEY_SESSION,
       ignoreExpiration: process.env.NODE_ENV === 'development',
     },
-    function (jwtPayload, next) {
+    (jwtPayload, next) => {
       console.log('payload received', jwtPayload.value)
       // usually this would be a database call:
       Usuario.findById(jwtPayload.value)
         .select('-password') // Selecciona todos los campos menos password
         .populate('productor')
         .populate('localidad')
-        .exec(function (err, user) {
+        .exec((err, user) => {
           if (err || !user) {
             return next(err, false)
           }
@@ -103,7 +103,7 @@ passport.use(
       callbackURL: `${process.env.SERVER_URL}/api/auth/facebook/callback`,
       profileFields: ['id', 'emails', 'photos', 'first_name', 'last_name'],
     },
-    function (accessToken, refreshToken, profile, done) {
+    (accessToken, refreshToken, profile, done) => {
       if (process.env.NODE_ENV === 'development') {
         console.log({ accessToken, profile: profile._json })
       }
@@ -129,13 +129,13 @@ passport.use(
   )
 )
 
-passport.serializeUser(function (user, cb) {
+passport.serializeUser((user, cb) => {
   if (process.env.NODE_ENV === 'development') {
     console.log('serializeUser', user.email)
   }
   cb(null, user._id)
 })
-passport.deserializeUser(function (id, cb) {
+passport.deserializeUser((id, cb) => {
   if (process.env.NODE_ENV === 'development') {
     console.log('deserializeUser', id)
   }
