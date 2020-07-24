@@ -183,7 +183,29 @@ router.post('/api/auth/forgetpassword', async (req, res) => {
   }
 })
 
-// TODO perdi la contraseña pero estoy logeado con facebook o Google
+router.post('/api/auth/changeOwnPassword', auth.isLogin, async (req, res) => {
+  try {
+    const errors = checkErrors([
+      check(req.body, 'actualPassword').isRequired(),
+      check(req.body, 'actualPassword').isString(),
+      check(req.body, 'newPassword').isRequired(),
+      check(req.body, 'newPassword').isPassword(),
+    ])
+    if (!errors) return sendRes(res, 400, errors, 'Body validation errors')
+    const usuario = await User.findById(req.user._id)
+    if (!(await usuario.authenticate(req.body.actualPassword))) {
+      return sendRes(res, 404, 'La contraseña actual es incorrecta', 'Error')
+    }
+
+    usuario.password = req.body.newPassword
+    await usuario.save()
+    usuario.password = ''
+
+    return sendRes(res, 200, usuario)
+  } catch (error) {
+    return sendRes(res, 500, 'Error con la base de datos', 'Error')
+  }
+})
 // POST api/auth/forgetpassword/change {token,email,password}
 router.post('/api/auth/forgetpassword/change', async (req, res) => {
   try {
@@ -209,7 +231,7 @@ router.post('/api/auth/forgetpassword/change', async (req, res) => {
 })
 
 // POST api/auth/forgetpassword/valid {token,email,password}
-router.get('/api/auth/forgetpassword/valid', function (req, res) {
+router.get('/api/auth/forgetpassword/valid', (req, res) => {
   try {
     const errors = checkErrors([check(req.query, 'token').isString()])
     if (!errors) return sendRes(res, 400, errors, 'Body validation errors')
