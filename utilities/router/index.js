@@ -35,10 +35,10 @@ const queryPage = (req, _, next) => {
   req.query.skip = parseInt(skip, 10)
   req.query.limit = limit > 0 ? limit : 15
   // Continuar con la consulta ala API
-  next()
+  return next()
 }
 
-const deleteProp = function (req, _, next) {
+const deleteProp = (req, _, next) => {
   const entity = req.body
   // delete entity.deleted;
   delete entity.createdAt
@@ -51,12 +51,10 @@ const deleteProp = function (req, _, next) {
     entity.deletedBy = req.user._id
   }
   // delete muni.updatedAt;
-  next()
+  return next()
 }
 
-const block = function (_, res) {
-  return sendRes(res, 404)
-}
+const block = (_, res) => sendRes(res, 404)
 
 module.exports = {
   ...checkProps,
