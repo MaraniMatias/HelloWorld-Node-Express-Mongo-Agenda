@@ -53,6 +53,12 @@ const schema = new Schema(
     password: { type: String, access: 'protected' },
     deleted: { type: Boolean, default: false },
     propducto: { type: ObjectId, ref: 'productor' },
+    estado: {
+      type: String,
+      uppercase: true,
+      enum: ['HABILITADO', 'DESHABILITADO'],
+      default: 'HABILITADO',
+    },
   },
   { timestamps: true }
 )
