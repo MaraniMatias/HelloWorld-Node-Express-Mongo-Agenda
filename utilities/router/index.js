@@ -1,23 +1,7 @@
 const get = require('../get')
 const auth = require('./routAuth')
 const checkProps = require('./checkProps')
-/**
- * sendRes
- *
- * Solo con el objetivo de enviar siempre una misma respuesta
- * @param {ExpressResponse} res
- * @param {String} cod Response Status Cod
- * @param {any} dataOrError, Response Data
- * @param {String} message Response Message
- * @returns {{data:any,message:string}}
- */
-const sendRes = (res, cod = 200, dataOrError, message) => {
-  res.status(cod)
-  return res.json({
-    data: dataOrError,
-    message: message || (cod === 200 ? 'Success' : undefined),
-  })
-}
+const sendRes = require('./sendRes')
 
 /**
  * Normalizar parametros para el paginado
@@ -35,10 +19,10 @@ const queryPage = (req, _, next) => {
   req.query.skip = parseInt(skip, 10)
   req.query.limit = limit > 0 ? limit : 15
   // Continuar con la consulta ala API
-  next()
+  return next()
 }
 
-const deleteProp = function (req, _, next) {
+const deleteProp = (req, _, next) => {
   const entity = req.body
   // delete entity.deleted;
   delete entity.createdAt
@@ -51,12 +35,10 @@ const deleteProp = function (req, _, next) {
     entity.deletedBy = req.user._id
   }
   // delete muni.updatedAt;
-  next()
+  return next()
 }
 
-const block = function (_, res) {
-  return sendRes(res, 404)
-}
+const block = (_, res) => sendRes(res, 404)
 
 module.exports = {
   ...checkProps,

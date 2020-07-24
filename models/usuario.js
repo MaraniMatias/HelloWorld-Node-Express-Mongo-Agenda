@@ -53,10 +53,17 @@ const schema = new Schema(
     password: { type: String, access: 'protected' },
     deleted: { type: Boolean, default: false },
     propducto: { type: ObjectId, ref: 'productor' },
+    estado: {
+      type: String,
+      uppercase: true,
+      enum: ['HABILITADO', 'DESHABILITADO'],
+      default: 'HABILITADO',
+    },
   },
   { timestamps: true }
 )
 schema.set('toJSON', { virtuals: true })
+schema.set('toObject', { virtuals: true })
 
 schema.virtual('display_name').get(function () {
   return this.razon_social || `${this.apellido} ${this.nombre}`
@@ -66,6 +73,11 @@ schema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, saltRounds)
   } else next()
+})
+
+schema.static('getPasswordHash', async function (user) {
+  user.password = await bcrypt.hash(user.password, saltRounds)
+  return user
 })
 
 // Checks password match

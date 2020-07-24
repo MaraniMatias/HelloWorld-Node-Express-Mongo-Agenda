@@ -58,11 +58,15 @@ passport.use(
         if (user && user.provider !== 'local') {
           return next(null, user)
         }
-        if (user && (await user.authenticate(password))) {
+        if (
+          user &&
+          user.estado === 'HABILITADO' &&
+          (await user.authenticate(password))
+        ) {
           user.password = null
           return next(null, user)
         }
-        return next(null, false)
+        return next('Usuario o contraseña icorecta', false)
       } catch (err) {
         return next(err, false)
       }
