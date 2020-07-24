@@ -183,7 +183,30 @@ router.post('/api/auth/forgetpassword', async (req, res) => {
   }
 })
 
-// TODO perdi la contraseña pero estoy logeado con facebook o Google
+router.post('/api/auth/changeOwnPassword', auth.isLogin, async (req, res) => {
+  try {
+    const errors = checkErrors([
+      check(req.body, 'actualPassword').isRequired(),
+      check(req.body, 'actualPassword').isString(),
+      check(req.body, 'newPassword').isRequired(),
+      check(req.body, 'newPassword').isPassword(),
+    ])
+    if (!errors) return sendRes(res, 400, errors, 'Body validation errors')
+    const usuario = await User.findById(req.user._id)
+    if (!(await usuario.authenticate(req.body.actualPassword))) {
+      return sendRes(res, 404, null, 'La contraseña actual es incorrecta')
+    }
+
+    usuario.password = req.body.newPassword
+    await usuario.save()
+    usuario.password = ''
+
+    // res, status, data, message, error
+    return sendRes(res, 200, usuario, 'Success', null)
+  } catch (error) {
+    return sendRes(res, 500, null, 'Error', 'Error con la base de datos')
+  }
+})
 // POST api/auth/forgetpassword/change {token,email,password}
 router.post('/api/auth/forgetpassword/change', async (req, res) => {
   try {
