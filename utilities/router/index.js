@@ -1,23 +1,7 @@
 const get = require('../get')
 const auth = require('./routAuth')
 const checkProps = require('./checkProps')
-/**
- * sendRes
- *
- * Solo con el objetivo de enviar siempre una misma respuesta
- * @param {ExpressResponse} res
- * @param {String} cod Response Status Cod
- * @param {any} dataOrError, Response Data
- * @param {String} message Response Message
- * @returns {{data:any,message:string}}
- */
-const sendRes = (res, cod = 200, dataOrError, message) => {
-  res.status(cod)
-  return res.json({
-    data: dataOrError,
-    message: message || (cod === 200 ? 'Success' : undefined),
-  })
-}
+const sendRes = require('./sendRes')
 
 /**
  * Normalizar parametros para el paginado
