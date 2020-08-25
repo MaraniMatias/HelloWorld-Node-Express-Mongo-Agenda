@@ -24,9 +24,16 @@ restify.serve(router, Usuario, {
       if (req.user._id.equals(usuario._id)) {
         return sendRes(res, 401, 'Unauthorized', 'Error')
       }
-      if (typeof usuario.password === 'string') {
+      if (
+        typeof usuario.password === 'string' &&
+        usuario.password !== '' 
+        // && objectId()(usuario.password) === true
+      ) {
         await Usuario.getPasswordHash(req.body)
+      } else {
+        delete req.body.password
       }
+
       return next()
     },
   ],
